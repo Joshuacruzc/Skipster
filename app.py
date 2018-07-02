@@ -2,6 +2,8 @@ from flask import Flask, request, redirect
 import spotipy
 from spotipy import util
 import urllib
+from urllib import request as urlrequest, parse
+import requests, base64
 
 app = Flask(__name__)
 
@@ -19,12 +21,13 @@ def register():
 
 @app.route('/index')
 def callback():
-    params = urllib.urlencode({'grant_type':"authorization_code", 'code': request.args.get('code'), 'redirect_uri':
-        'http:localhost:5000/index'})
-    token = urllib.urlopen("https://accounts.spotify.com/api/token", params)
+    params = {'grant_type': "authorization_code", 'code': request.args.get('code'), 'redirect_uri':
+        'http:localhost:5000/index',}
+    b64Val = base64.b64encode(b"e0147040c0e24397a075519bb718324:597c98f23fec464896e87e9e87c26cff")
+    token = requests.post("https://accounts.spotify.com/api/token", headers={"Authorization": "Basic %s" % b64Val},params=params)
     print(token)
 
-    return str(token) + 'lol'
+    return 'lol'
 
 
 
