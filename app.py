@@ -1,5 +1,5 @@
 from flask import Flask, request, redirect
-import spotipy
+from spotipy import oauth2
 from spotipy import util
 import urllib
 from urllib import request as urlrequest, parse
@@ -15,17 +15,17 @@ def initial():
 @app.route('/register', methods = ['GET'])
 def register():
     return redirect('https://accounts.spotify.com/authorize/?client_'
-                 'id=e0147040c0e24397a075519bb718324d&response_type='
-                 'code&redirect_uri=http://localhost:5000/index&'
+                 'id=2fb54226ea3f4a748b823a0ce06704c2&response_type='
+                 'code&redirect_uri=http://localhost/index&'
                  'scope=user-read-private%20user-read-email&state=34fFs29kd09')
 
 @app.route('/index')
 def callback():
     params = {'grant_type': "authorization_code", 'code': request.args.get('code'), 'redirect_uri':
-        'http:localhost:5000/index',}
-    b64Val = base64.b64encode(b"e0147040c0e24397a075519bb718324:597c98f23fec464896e87e9e87c26cff")
-    token = requests.post("https://accounts.spotify.com/api/token", headers={"Authorization": "Basic %s" % b64Val},params=params)
-    print(token)
+        'http://localhost/index',"client_id": '2fb54226ea3f4a748b823a0ce06704c2', "client_secret":'5f57b22c53294d54befc2dd5667c1268' }
+    b64Val = base64.urlsafe_b64encode(b"2fb54226ea3f4a748b823a0ce06704c2:5f57b22c53294d54befc2dd5667c1268")
+    token = requests.post('https://accounts.spotify.com/api/token', headers={"Content-type": "application/x-www-form-urlencoded"},params=params)
+    print(token.json())
 
     return 'lol'
 
