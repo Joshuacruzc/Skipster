@@ -12,7 +12,7 @@ def index():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('account'))
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
@@ -28,13 +28,13 @@ def register():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('account'))
     form = LoginForm()
     if form.validate_on_submit():
       user = User.query.filter_by(email=form.email.data).first()
       if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user, form.remember.data)
-            return redirect(url_for('dashboard'))
+            return redirect(url_for('account'))
       else:
             flash('Login unsuccessful. Please check login information', 'danger')
     return render_template('login.html', title='Login', form=form)
@@ -44,10 +44,10 @@ def logout():
         logout_user()
         return redirect(url_for('index'))
 
-@app.route('/dashboard')
+@app.route('/account')
 @login_required
-def dashboard():
-    return render_template('dashboard.html', user=current_user)
+def account():
+    return render_template('account.html', user=current_user)
 
 
 # @app.route('/index')

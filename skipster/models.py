@@ -20,7 +20,7 @@ class User(db.Model, UserMixin):
     profile_picture = db.Column('profile_picture', db.String(20), nullable = False, default = 'default.jpg')
     registered_on = db.Column('registered_on', db.DateTime, nullable= False, default=datetime.utcnow)
     host_id = db.Column(db.Integer, db.ForeignKey('host.id'), nullable = True, default=0)
-
+    # spotify_uri
     # TODO add many to many relationship with Host
 
     def __repr__(self):
@@ -32,6 +32,6 @@ class Playlist(db.Model):
     name = db.Column(db.String(20), nullable=False)
     description = db.Column(db.String(250), nullable=True)
     host_id = db.Column(db.Integer, db.ForeignKey('host.id'), nullable=False)
-    uri = db.Column(db.String(150), nullable=True)
+    spotify_uri = db.Column(db.String(150), nullable=True)
     def __repr__(self):
         return f"Playlist('{self.name}')"
