@@ -1,0 +1,8 @@
+{% extends "form_layout.html" %}
+
+{% block small_print %}
+    <small class="text-muted">
+        Don't Have an account? <a href={{ url_for('register') }}>Sign up here!</a><br>
+        <a href="#">Forgot password?</a>
+    </small>
+{% endblock small_print %}
