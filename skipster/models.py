@@ -6,23 +6,30 @@ from flask_login import UserMixin
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+HostUser_table = db.Table('HostUser',
+                          db.Column('host_id', db.Integer, db.ForeignKey('host.id'), nullable=False),
+                          db.Column('user_id', db.Integer, db.ForeignKey('user.id'), nullable=False),
+                          db.PrimaryKeyConstraint('host_id', 'user_id'))
 class Host(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(30), nullable=False)
     playlists = db.relationship('Playlist', backref='player', lazy=True)
-    users = db.relationship('User', backref='master', lazy=True)
+    users = db.relationship('User', backref='host', secondary='HostUser')
+
+    def __repr__(self):
+        return f"Host('{self.name}')"
 
 class User(db.Model, UserMixin):
-    id = db.Column('user_id', db.Integer, primary_key=True)
-    username = db.Column('username', db.String(20), unique=True, nullable=False)
-    password = db.Column('password', db.String(60), nullable=False)
-    email = db.Column('email', db.String(50), unique=True)
-    profile_picture = db.Column('profile_picture', db.String(20), nullable = False, default = 'default.jpg')
-    registered_on = db.Column('registered_on', db.DateTime, nullable= False, default=datetime.utcnow)
-    host_id = db.Column(db.Integer, db.ForeignKey('host.id'), nullable = True, default=0)
-    # spotify_uri
-    # TODO add many to many relationship with Host
-
+    id = db.Column('id', db.Integer, primary_key=True)
+    username = db.Column( db.String(20), unique=True, nullable=False)
+    password = db.Column( db.String(60), nullable=False)
+    email = db.Column( db.String(50), unique=True)
+    profile_picture = db.Column(db.String(20), nullable = False, default = 'default.jpg')
+    registered_on = db.Column(db.DateTime, nullable= False, default=datetime.utcnow)
+    hosts = db.relationship('Host', backref='user', secondary='HostUser')
+    spotify_id = db.Column(db.String(150), nullable=True)
+    # refresh_token =
+    # Todo verify if refresh token can be stored in database securely
     def __repr__(self):
         return f"User('{self.username}')"
 

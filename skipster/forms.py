@@ -12,6 +12,7 @@ class RegistrationForm(FlaskForm):
                              validators=[DataRequired(), Length(min=8)])
     confirm_password = PasswordField('Confirm Password',
                                      validators =[DataRequired(), EqualTo('password')])
+    spotify_link = BooleanField('Link to Spotify Account?')
     submit = SubmitField('Register')
 
     def validate_username(self, username):
@@ -28,5 +29,5 @@ class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password',
                              validators=[DataRequired(), Length(min=8)])
-    remember = BooleanField('Remember Me')
+    # remember = BooleanField('Remember Me')
     submit = SubmitField('Login')

@@ -1,5 +1,19 @@
 {% extends "layout.html" %}
 
 {% block content %}
-    <h2>{{ user.username }}'s Account</h2>
+    <h2>{{ user.spotify_id }}'s Account</h2>
+    <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3>Hosts: </h3>
+                    {% if current_user.host %}
+                        <ul class = "host-list">
+                        {% for host in current_user.host %}
+                            <li><a href={{url_for('dashboard', host_id= host.id)}}>{{host.name}}</a></li>
+                        {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p> No host for this account.</p>
+                    {% endif %}
+                    <a href="#">Register Host</a>
 {% endblock content %}
