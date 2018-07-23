@@ -12,6 +12,7 @@ from skipster.SpotifyClient import spotify_authorize, code_for_token, get_user_p
 def index():
     return render_template('index.html')
 
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
@@ -23,11 +24,14 @@ def register():
         db.session.add(user)
         db.session.commit()
         login_user(user)
-        if form.spotify_link.data == True:
-           url =  spotify_authorize()
+        if form.spotify_link.data:
+            url = spotify_authorize()
+        else:
+            url = url_for('account')
         flash("Your account has been created succesfully", 'success')
         return  redirect(url)
     return render_template('register.html', title='Register', form=form)
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -43,18 +47,23 @@ def login():
             flash('Login unsuccessful. Please check login information', 'danger')
     return render_template('login.html', title='Login', form=form)
 
+
 @app.route('/logout')
 def logout():
         logout_user()
         return redirect(url_for('index'))
 
+
 @app.route('/account')
 @login_required
 def account():
-    token = refresh_access_token(current_user)
-    top_tracks = get_user_top_tracks(token)
-    example_url =  top_tracks['items'][1]['album']['images'][0]['url']
-    return render_template('account.html', user=current_user, example_url=example_url)
+    user = current_user
+    if user.spotify_id is not None:
+        token = refresh_access_token(current_user)
+        top_tracks = get_user_top_tracks(token)
+        example_url = top_tracks['items'][1]['album']['images'][0]['url']
+        return render_template('account.html', user=current_user, example_url=example_url)
+    return render_template('account.html', user=current_user, example_url='')
 
 @app.route('/dashboard/<host_id>')
 @login_required
@@ -69,6 +78,7 @@ def dashboard(host_id):
     else:
         flash(f'Host with Host ID: "{host_id}" does not exist or has been removed', 'danger')
         return redirect(url_for('index'))
+
 
 @app.route('/callback')
 def callback():

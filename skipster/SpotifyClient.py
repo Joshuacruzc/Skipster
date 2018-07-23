@@ -52,3 +52,5 @@ def create_playlist(token, user_id, name):
     params = {'name': name, 'description': 'Link al website and promotional gimmicks'}
     response = requests.post(url, headers={"Authorization": 'Bearer ' + token, "Content_type": 'application/json'}, data=json.dumps(params))
     return response
+
+
