@@ -65,6 +65,7 @@ def account():
         return render_template('account.html', user=current_user, example_url=example_url)
     return render_template('account.html', user=current_user, example_url='')
 
+
 @app.route('/dashboard/<host_id>')
 @login_required
 def dashboard(host_id):
