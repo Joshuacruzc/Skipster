@@ -72,12 +72,9 @@ def dashboard(host_id):
 
 @app.route('/callback')
 def callback():
-    user = print(current_user)
+    user = current_user
     access_token, refresh_token = code_for_token(request)
     user_profile = get_user_profile(access_token)
-    print(current_user)
-    print(current_user.id)
-    user = User.query.all()[0]
     user.spotify_id = user_profile['id']
     user.refresh_token = refresh_token
     db.session.commit()
