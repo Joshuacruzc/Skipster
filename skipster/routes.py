@@ -4,13 +4,13 @@ from skipster.forms import RegistrationForm, LoginForm
 from skipster import app, db, bcrypt
 from skipster.models import User, Host, Playlist
 from flask_login import login_user, current_user, logout_user, login_required
-from skipster.SpotifyClient import spotify_authorize, code_for_token, get_user_profile
+from skipster.SpotifyClient import spotify_authorize, code_for_token, get_user_profile, refresh_access_token, \
+    get_user_top_tracks
 
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     return render_template('index.html')
-
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -28,8 +28,6 @@ def register():
         flash("Your account has been created succesfully", 'success')
         return  redirect(url)
     return render_template('register.html', title='Register', form=form)
-    # if request.method == 'POST':
-    #     return get_token()
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -53,7 +51,10 @@ def logout():
 @app.route('/account')
 @login_required
 def account():
-    return render_template('account.html', user=current_user)
+    token = refresh_access_token(current_user)
+    top_tracks = get_user_top_tracks(token)
+    example_url =  top_tracks['items'][1]['album']['images'][0]['url']
+    return render_template('account.html', user=current_user, example_url=example_url)
 
 @app.route('/dashboard/<host_id>')
 @login_required
@@ -71,10 +72,14 @@ def dashboard(host_id):
 
 @app.route('/callback')
 def callback():
-    token = code_for_token(request)
-    user_profile = get_user_profile(token)
-    user = User.query.get(current_user.id)
+    user = print(current_user)
+    access_token, refresh_token = code_for_token(request)
+    user_profile = get_user_profile(access_token)
+    print(current_user)
+    print(current_user.id)
+    user = User.query.all()[0]
     user.spotify_id = user_profile['id']
+    user.refresh_token = refresh_token
     db.session.commit()
     return redirect(url_for('account'))
     #

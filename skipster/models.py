@@ -28,8 +28,8 @@ class User(db.Model, UserMixin):
     registered_on = db.Column(db.DateTime, nullable= False, default=datetime.utcnow)
     hosts = db.relationship('Host', backref='user', secondary='HostUser')
     spotify_id = db.Column(db.String(150), nullable=True)
-    # refresh_token =
-    # Todo verify if refresh token can be stored in database securely
+    refresh_token =db.Column(db.String(300), nullable =True )
+
     def __repr__(self):
         return f"User('{self.username}')"
 
