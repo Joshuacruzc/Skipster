@@ -14,7 +14,7 @@ response_type = 'code'
 redirect_uri = 'http://localhost:5000/callback'
 
 def spotify_authorize():
-    url = "https://accounts.spotify.com/authorize/?client_id=%s&response_type=code&redirect_uri=%s&scope=%s&state=34fFs29kd09" % (client_id, redirect_uri, scopes)
+    url = "https://accounts.spotify.com/authorize/?client_id=%s&response_type=code&redirect_uri=%s&scope=%s&state=34fFs29kd09&show_dialog=true" % (client_id, redirect_uri, scopes)
     return url
 
 def code_for_token(request):
