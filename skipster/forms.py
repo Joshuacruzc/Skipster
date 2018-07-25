@@ -31,3 +31,10 @@ class LoginForm(FlaskForm):
                              validators=[DataRequired(), Length(min=8)])
     # remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
+
+class HostForm(FlaskForm):
+    host = StringField('Host Name',
+                           validators=[DataRequired(), Length(min=3, max=50), ])
+    playlist = StringField('Playlist Name',
+                           validators=[DataRequired(), Length(min=3, max=50), ])
+    submit = SubmitField('Create Playlist')
