@@ -2,14 +2,18 @@ from skipster import db, login_manager
 from datetime import datetime
 from flask_login import UserMixin
 
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
 
 HostUser_table = db.Table('HostUser',
                           db.Column('host_id', db.Integer, db.ForeignKey('host.id'), nullable=False),
                           db.Column('user_id', db.Integer, db.ForeignKey('user.id'), nullable=False),
                           db.PrimaryKeyConstraint('host_id', 'user_id'))
+
+
 class Host(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(30), nullable=False)
@@ -18,6 +22,7 @@ class Host(db.Model):
 
     def __repr__(self):
         return f"Host('{self.name}')"
+
 
 class User(db.Model, UserMixin):
     id = db.Column('id', db.Integer, primary_key=True)
@@ -40,5 +45,6 @@ class Playlist(db.Model):
     description = db.Column(db.String(250), nullable=True)
     host_id = db.Column(db.Integer, db.ForeignKey('host.id'), nullable=False)
     spotify_uri = db.Column(db.String(150), nullable=True)
+
     def __repr__(self):
         return f"Playlist('{self.name}')"

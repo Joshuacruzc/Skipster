@@ -1,5 +1,5 @@
 import requests
-from flask import render_template, url_for, flash, redirect,request
+from flask import render_template, url_for, flash, redirect, request
 from skipster.forms import RegistrationForm, LoginForm, HostForm
 from skipster import app, db, bcrypt
 from skipster.models import User, Host, Playlist
@@ -24,11 +24,12 @@ def register():
         db.session.add(user)
         db.session.commit()
         login_user(user)
-        if form.spotify_link.data == True:
-           url =  spotify_authorize()
+        if form.spotify_link.data:
+            url = spotify_authorize()
         flash("Your account has been created successfully", 'success')
-        return  redirect(url)
+        return redirect(url)
     return render_template('register.html', title='Register', form=form)
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -36,19 +37,19 @@ def login():
         return redirect(url_for('account'))
     form = LoginForm()
     if form.validate_on_submit():
-      user = User.query.filter_by(email=form.email.data).first()
-      if user and bcrypt.check_password_hash(user.password, form.password.data):
+        user = User.query.filter_by(email=form.email.data).first()
+        if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user)
             return redirect(url_for('account'))
-      else:
+        else:
             flash('Login unsuccessful. Please check login information', 'danger')
     return render_template('login.html', title='Login', form=form)
 
 
 @app.route('/logout')
 def logout():
-        logout_user()
-        return redirect(url_for('index'))
+    logout_user()
+    return redirect(url_for('index'))
 
 
 @app.route('/account')
@@ -56,7 +57,7 @@ def logout():
 def account():
     user = current_user
     top_tracks = get_user_top_tracks(user)
-    example_url =  top_tracks['items'][1]['album']['images'][0]['url']
+    example_url = top_tracks['items'][1]['album']['images'][0]['url']
     return render_template('account.html', user=current_user, example_url=example_url)
 
 
@@ -73,11 +74,13 @@ def register_host():
         user = User.query.get(current_user.id)
         host.users.append(user)
         playlist = create_playlist(current_user, form.host.data)
-        playlist = Playlist(name = form.playlist.data, description=playlist['description'], host_id= host.id, spotify_uri= playlist['id'])
+        playlist = Playlist(name=form.playlist.data, description=playlist['description'], host_id=host.id,
+                            spotify_uri=playlist['id'])
         db.session.add(playlist)
         db.session.commit()
         flash("Your playlist has been created successfully", 'success')
-    return render_template('register_host.html', form= form, spotify_data = top_tracks)
+    return render_template('register_host.html', form=form, spotify_data=top_tracks)
+
 
 # @app.route('/add_tracks/<playlist_id>', methods=['GET', 'POST'])
 # @login_required
@@ -85,6 +88,8 @@ def register_host():
 #     playlist = Playlist.query.get(playlist_id)
 #     if playlist:
 #         if current_user in playlist
+
+
 @app.route('/dashboard/<host_id>')
 @login_required
 def dashboard(host_id):
@@ -99,9 +104,10 @@ def dashboard(host_id):
         flash(f'Host with Host ID: "{host_id}" does not exist or has been removed', 'danger')
         return redirect(url_for('index'))
 
+
 @app.route('/callback')
 def callback():
-    user = current_user
+    user = User.query.get(current_user.id)
     access_token, refresh_token = code_for_token(request)
     user_profile = get_user_profile(access_token)
     user.spotify_id = user_profile['id']

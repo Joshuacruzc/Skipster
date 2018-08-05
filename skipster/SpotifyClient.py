@@ -13,9 +13,11 @@ scopes = parse.quote(scopes.encode('utf-8'))
 response_type = 'code'
 redirect_uri = 'http://localhost:5000/callback'
 
+
 def spotify_authorize():
     url = "https://accounts.spotify.com/authorize/?client_id=%s&response_type=code&redirect_uri=%s&scope=%s&state=34fFs29kd09&show_dialog=true" % (client_id, redirect_uri, scopes)
     return url
+
 
 def code_for_token(request):
     url = 'https://accounts.spotify.com/api/token'
@@ -26,6 +28,7 @@ def code_for_token(request):
     refresh_token = dict['refresh_token']
     return access_token, refresh_token
 
+
 def refresh_access_token(user):
     url = 'https://accounts.spotify.com/api/token'
     params = {'grant_type': "refresh_token", 'refresh_token': user.refresh_token}
@@ -34,11 +37,13 @@ def refresh_access_token(user):
     access_token = dict['access_token']
     return access_token
 
+
 def get_user_profile(token):
     url = 'https://api.spotify.com/v1/me'
     response = requests.get(url, headers={"Authorization": 'Bearer ' + token})
     user_profile = json.loads(response.text)
     return user_profile
+
 
 def get_user_top_tracks(user):
         token = refresh_access_token(user)
@@ -47,8 +52,9 @@ def get_user_top_tracks(user):
         top_tracks = json.loads(response.text)
         return top_tracks
 
+
 def create_playlist(user, name):
-# Description: Made by skipster, link al website
+    # Description: Made by skipster, link al website
     token = refresh_access_token(user)
     url = 'https://api.spotify.com/v1/users/%s/playlists' % user.spotify_id
     params = {'name': name, 'description': 'Link al website and promotional gimmicks'}

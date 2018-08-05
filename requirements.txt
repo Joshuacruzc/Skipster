@@ -1,1 +1,5 @@
-'flask_sqlalchemy'
+flask_sqlalchemy
+flask
+flask_wtf
+flask_login
+requests
