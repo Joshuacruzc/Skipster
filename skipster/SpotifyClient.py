@@ -60,4 +60,8 @@ def create_playlist(token, user_id, name):
     response = requests.post(url, headers={"Authorization": 'Bearer ' + token, "Content_type": 'application/json'}, data=json.dumps(params))
     return response
 
+def is_threshold():
+    pass
+    #returns boolean that says if it is time t recalculate the playlist
+
 

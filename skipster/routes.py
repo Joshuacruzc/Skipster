@@ -95,3 +95,8 @@ def callback():
     return redirect(url_for('account'))
     #
     # return create_playlist(dict['access_token'], '12152455838', 'Hola Alberto').content
+
+@app.route('<playlist_id>/vote/<song_id>')
+def vote():
+    # vote a specific song. Upvote or downvote should be contained in POST
+    pass

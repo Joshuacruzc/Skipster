@@ -25,7 +25,6 @@ PlaylistSong_table = db.Table('PlaylistSong',
                               db.PrimaryKeyConstraint('playlist_id', 'song_id'))
 
 
-
 class Host(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(30), nullable=False)
