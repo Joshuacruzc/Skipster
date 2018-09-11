@@ -1,4 +1,4 @@
-from skipster import db
+from skipster.models import db
 
 db.drop_all()
 db.create_all()
