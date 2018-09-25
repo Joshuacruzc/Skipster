@@ -79,7 +79,7 @@ def register_host():
 
 
 @app.route('/add_tracks/<playlist_id>', methods=['GET', 'POST'])
-@login_required
+# @login_required
 def add_tracks(playlist_id):
     playlist = Playlist.query.get(playlist_id)
     if playlist:
@@ -124,6 +124,16 @@ def add_this_track():
         return '%s successfully added to playlist' % track.name
 
 
+@app.route('/remove_track', methods=['POST'])
+def remove_track():
+    dict = request.form
+    playlist = Playlist.query.get(dict['playlist_id'])
+    track = Track.query.filter_by(uri=dict['uri']).first()
+    playlist.tracks.remove(track)
+    db.session.commit()
+    return '%s successfully removed from playlist' % track[0].name
+
+
 @app.route('/dashboard/<host_id>')
 @login_required
 def dashboard(host_id):
@@ -145,14 +155,17 @@ def auth():
 @app.route('/test')
 def test_route():
     tracks = get_playlist_tracks(Playlist.query.all()[0].uri)
-    tracks = clean_track_json(tracks)
+    #tracks = clean_track_json(tracks)
     return tracks
 
 
-@app.route('/skip')
-def skip():
+@app.route('/skip/<host_id>')
+def skip(host_id):
     # interface for voting and suggesting songs
-    pass
+    host = Host.query.get(host_id)
+    playlist = host.playlists[0]
+    tracks = playlist.tracks
+    return render_template('skip.html', playlist=playlist)
 
 @app.route('/join_host/<host_id>')
 def join_host(host_id):

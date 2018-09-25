@@ -97,4 +97,4 @@ def get_playlist_tracks(playlist_id):
     url = "https://api.spotify.com/v1/playlists/%s/tracks" % playlist_id
     response = requests.get(url,headers={"Authorization": 'Bearer ' + localSkipster.access_token})
     tracks = json.loads(response.text)
-    return tracks
+    return response.text
