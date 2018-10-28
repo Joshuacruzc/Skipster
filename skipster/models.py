@@ -1,3 +1,5 @@
+from sqlalchemy.ext.orderinglist import ordering_list
+
 from skipster import db, login_manager
 from datetime import datetime
 from flask_login import UserMixin
@@ -12,24 +14,19 @@ HostUser_table = db.Table('HostUser',
                           db.PrimaryKeyConstraint('host_id', 'user_id'))
 
 
-PlaylistTrack_table = db.Table('PlaylistTrack',
-                               db.Column('playlist_id', db.Integer, db.ForeignKey('playlist.id'), nullable=False),
-                               db.Column('track_id', db.Integer, db.ForeignKey('track.id'), nullable=False),
-                               db.Column('affinity', db.Integer, default=0))
-
-#TODO: ADD REGION FIELD
-class Skipster(db.Model):
+class PlaylistTrack(db.Model):
     id = db.Column( db.Integer, primary_key=True)
-    access_token = db.Column( db.String(300))
-    refresh_token = db.Column( db.String(300))
-    uri = db.Column(db.String(60))
+    playlist = db.Column('playlist_id', db.Integer, db.ForeignKey('playlist.id'), nullable=False)
+    track = db.Column('track_id', db.Integer, db.ForeignKey('track.id'), nullable=False)
+    affinity = db.Column('affinity', db.Integer, default=0)
+    is_active = db.Column(db.Boolean, nullable=False, default=False)
 
-# TODO: MAKE FOREIGN KEY FROM HOST TO LOCAL SKISPTER (ACCOUNT THAT HOLDS PLAYLIST FOR SAID HOST)
+
 class Host(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60), nullable=False)
     playlists = db.relationship('Playlist', backref='host', lazy=True)
-    users = db.relationship('User', backref='hosts', secondary='HostUser')
+    users = db.relationship('User', backref='hosts', secondary='HostUser', cascade='all')
 
     def __repr__(self):
         return f"Host('{self.name}')"
@@ -42,9 +39,8 @@ class User(db.Model, UserMixin):
     email = db.Column( db.String(50), unique=True)
     profile_picture = db.Column(db.String(120), nullable = False, default = 'default.jpg')
     registered_on = db.Column(db.DateTime, nullable= False, default=datetime.utcnow)
-    # hosts = db.relationship('Host', backref='users', secondary='HostUser')
-    # spotify_id = db.Column(db.String(150), nullable=True)
-    # refresh_token =db.Column(db.String(300), nullable =True )
+    refresh_token = db.Column(db.String(300), nullable=True)
+    uri = db.Column(db.String(60), nullable=True)
 
     def __repr__(self):
         return f"User('{self.username}')"
@@ -56,7 +52,7 @@ class Playlist(db.Model):
     description = db.Column(db.String(250), nullable=True)
     host_id = db.Column(db.Integer, db.ForeignKey('host.id'), nullable=False)
     uri = db.Column(db.String(150), nullable=True)
-    tracks = db.relationship('Track', backref='playlists', secondary='PlaylistTrack')
+    tracks = db.relationship('Track', backref='playlists', secondary='playlist_track', cascade='all')
 
     def __repr__(self):
         return f"Playlist('{self.name}')"

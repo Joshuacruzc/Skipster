@@ -3,7 +3,7 @@ import requests
 import json
 
 from skipster import db
-from skipster.models import Skipster, Track
+from skipster.models import Track, Host
 
 client_id = "e0147040c0e24397a075519bb718324d"
 client_secret = '597c98f23fec464896e87e9e87c26cff'
@@ -25,15 +25,13 @@ def code_for_token(request):
     return access_token, refresh_token
 
 
-def refresh_access_token(host_id=None):
-    localSkipster = Skipster.query.all()[0]
-    refresh_token = localSkipster.refresh_token
+def refresh_access_token(user):
+    refresh_token = user.refresh_token
     url = 'https://accounts.spotify.com/api/token'
     params = {'grant_type': "refresh_token", 'refresh_token': refresh_token}
     response = requests.post(url, data = params, auth=auth)
     dict = json.loads(response.text)
-    localSkipster.access_token = dict['access_token']
-    db.session.commit()
+    return dict['access_token']
 
 
 def get_user_profile(token):
@@ -43,40 +41,37 @@ def get_user_profile(token):
     return user_profile
 
 
-def create_playlist(name):
+def create_playlist(name, user):
     # Description: Made by skipster, link al website
-    refresh_access_token()
-    localSkipster = Skipster.query.all()[0]
-    url = 'https://api.spotify.com/v1/users/%s/playlists' % localSkipster.uri
+    access_token = refresh_access_token(user)
+    url = 'https://api.spotify.com/v1/users/%s/playlists' % user.uri
     params = {'name': name, 'description': 'Link al website and promotional gimmicks'}
-    response = requests.post(url, headers={"Authorization": 'Bearer ' + localSkipster.access_token, "Content_type": 'application/json'}, data=json.dumps(params))
+    response = requests.post(url, headers={"Authorization": 'Bearer ' + access_token, "Content_type": 'application/json'}, data=json.dumps(params))
     playlist = json.loads(response.text)
     return playlist
 
-def search_spotify(search_text):
-    refresh_access_token()
-    localSkipster = Skipster.query.all()[0]
+def search_spotify(search_text, user):
+    access_token = refresh_access_token(user)
     url = 'https://api.spotify.com/v1/search'
     params = {'q': search_text, 'type': 'track'}
-    response = requests.get(url,headers={"Authorization": 'Bearer ' + localSkipster.access_token}, params=params )
+    response = requests.get(url,headers={"Authorization": 'Bearer ' + access_token}, params=params )
     result = json.loads(response.text)
     return result
 
-def add_tracks_to_playlist(playlist_id, tracks):
-    refresh_access_token()
-    localSkipster = Skipster.query.all()[0]
+def add_tracks_to_playlist(playlist_id, tracks, user):
+    access_token = refresh_access_token(user)
     url = "https://api.spotify.com/v1/playlists/%s/tracks" % playlist_id
-    params = {'uris': track.uri for track in tracks}
-    response = requests.post(url, headers={"Authorization": 'Bearer ' + localSkipster.access_token,
+    tracks = [track.uri for track in tracks]
+    params = {'uris': ",".join(tracks)}
+    response = requests.post(url, headers={"Authorization": 'Bearer ' + access_token,
                                          "Content_type": 'application/json'}, params=params)
     return response.status_code
 
-def remove_tracks_from_playlist(playlist_id, tracks):
-    refresh_access_token()
-    localSkipster = Skipster.query.all()[0]
+def remove_tracks_from_playlist(playlist_id, tracks, user):
+    access_token = refresh_access_token(user)
     url = "https://api.spotify.com/v1/playlists/%s/tracks" % playlist_id
     params = {'tracks':[{'uri': track.uri for track in tracks}]}
-    response = requests.delete(url, headers={"Authorization": 'Bearer ' + localSkipster.access_token,
+    response = requests.delete(url, headers={"Authorization": 'Bearer ' + access_token,
                                            "Content_type": 'application/json'}, params=params)
     return response.status_code
 
@@ -91,10 +86,9 @@ def clean_track_json(json):
         tracks.append({'uri':uri, 'name':name, 'artist':artist, 'album':album, 'artwork':artwork})
     return tracks
 
-def get_playlist_tracks(playlist_id):
-    refresh_access_token()
-    localSkipster = Skipster.query.all()[0]
+def get_playlist_tracks(playlist_id, user):
+    access_token = refresh_access_token(user)
     url = "https://api.spotify.com/v1/playlists/%s/tracks" % playlist_id
-    response = requests.get(url,headers={"Authorization": 'Bearer ' + localSkipster.access_token})
+    response = requests.get(url,headers={"Authorization": 'Bearer ' + access_token})
     tracks = json.loads(response.text)
     return response.text
