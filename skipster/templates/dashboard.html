@@ -1,9 +1,11 @@
 {% extends "layout.html" %}
 
 {% block content %}
-    {% if current_user in host.user %}
-        <h2>Hello World</h2>
-    {% else %}
-
-    {% endif %}
+<h2>{{host.name}}</h2>
+    <ul>
+    {% for playlist in host.playlists %}
+        <li>{{ playlist.name }} </li>
+        <a href="{{ url_for('add_tracks', playlist_id=playlist.id) }}">add tracks</a>
+    {% endfor %}
+    </ul>
 {% endblock content %}

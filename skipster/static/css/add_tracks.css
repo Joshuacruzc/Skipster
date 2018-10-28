@@ -1,0 +1,34 @@
+
+#search_bar{
+    width: 60%;
+    margin-bottom: 35px;
+}
+ul{
+    list-style-type: none;
+}
+#track_list li{
+    width:75%;
+    height:80px;
+    margin-bottom: 10px;
+}
+#track_list li img {
+    height: 100%;
+    margin-right: 5px;
+}
+#current_tracks li{
+    width:75%;
+    height:80px;
+    margin-bottom: 10px;
+}
+#current_tracks li img{
+    height: 100%;
+    margin-right: 5px;
+}
+.add{
+    float: right;
+    background-color: green;
+}
+.remove{
+    float: right;
+    background-color: red;
+}
